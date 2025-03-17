@@ -1,0 +1,146 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API for retrieving weather information by location",
+        "title": "Weather API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/temperature": {
+            "post": {
+                "description": "Recebe um CEP no corpo da requisição e retorna informações de clima.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Weather"
+                ],
+                "summary": "Get Weather by CEP",
+                "parameters": [
+                    {
+                        "description": "CEP da Localização",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_infra_web.Location"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/otellab_internal_usecase.WeatherByCepOutputDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/internal_infra_web.Error400"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/internal_infra_web.Error404"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/internal_infra_web.Error422"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_infra_web.Error500"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "internal_infra_web.Error400": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "invalid JSON body, must be in the format {\"cep\": \"01001001\"}"
+                }
+            }
+        },
+        "internal_infra_web.Error404": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "location not found"
+                }
+            }
+        },
+        "internal_infra_web.Error422": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "invalid zipcode"
+                }
+            }
+        },
+        "internal_infra_web.Error500": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "internal server error"
+                }
+            }
+        },
+        "internal_infra_web.Location": {
+            "type": "object",
+            "properties": {
+                "cep": {
+                    "type": "string",
+                    "example": "01001001"
+                }
+            }
+        },
+        "otellab_internal_usecase.WeatherByCepOutputDTO": {
+            "type": "object",
+            "properties": {
+                "cep": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "coordinates": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "temp_C": {
+                    "type": "number"
+                },
+                "temp_F": {
+                    "type": "number"
+                },
+                "temp_K": {
+                    "type": "number"
+                }
+            }
+        }
+    }
+}

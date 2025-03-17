@@ -1,0 +1,87 @@
+basePath: /
+definitions:
+  internal_infra_web.Error404:
+    properties:
+      error:
+        example: location not found
+        type: string
+    type: object
+  internal_infra_web.Error422:
+    properties:
+      error:
+        example: invalid location
+        type: string
+    type: object
+  internal_infra_web.Error500:
+    properties:
+      error:
+        example: internal server error
+        type: string
+    type: object
+  temperatures_internal_usecase_get_weather.GetWeatherOutputDTO:
+    properties:
+      city:
+        type: string
+      coordinates:
+        type: string
+      country:
+        type: string
+      humidity_in_percentage:
+        type: integer
+      precipitation_in_millimeters:
+        type: number
+      pressure_in_millibars:
+        type: number
+      region:
+        type: string
+      temp_C:
+        type: number
+      temp_F:
+        type: number
+      temp_K:
+        type: number
+      wind_direction:
+        type: string
+      wind_in_kph:
+        type: number
+    type: object
+info:
+  contact: {}
+  description: API for retrieving weather information by location
+  title: Weather API
+  version: "1.0"
+paths:
+  /temperature/{location}:
+    get:
+      consumes:
+      - application/json
+      description: Returns weather info by location (CEP or lat,lng)
+      parameters:
+      - description: Location (CEP or lat,lng)
+        in: path
+        name: location
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/temperatures_internal_usecase_get_weather.GetWeatherOutputDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_infra_web.Error404'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/internal_infra_web.Error422'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_infra_web.Error500'
+      summary: Get Weather by Location
+      tags:
+      - Weather
+swagger: "2.0"

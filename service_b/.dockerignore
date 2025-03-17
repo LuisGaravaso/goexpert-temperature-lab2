@@ -1,0 +1,12 @@
+# Ignorar arquivos de teste
+**/*_test.go
+
+# Ignorar pastas de mocks
+**/mocks/
+
+# Ignorar arquivos de repositório e build locais
+.git
+.gitignore
+README.md
+LICENSE
+Makefile

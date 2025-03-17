@@ -1,0 +1,96 @@
+basePath: /
+definitions:
+  internal_infra_web.Error400:
+    properties:
+      error:
+        example: 'invalid JSON body, must be in the format {"cep": "01001001"}'
+        type: string
+    type: object
+  internal_infra_web.Error404:
+    properties:
+      error:
+        example: location not found
+        type: string
+    type: object
+  internal_infra_web.Error422:
+    properties:
+      error:
+        example: invalid zipcode
+        type: string
+    type: object
+  internal_infra_web.Error500:
+    properties:
+      error:
+        example: internal server error
+        type: string
+    type: object
+  internal_infra_web.Location:
+    properties:
+      cep:
+        example: "01001001"
+        type: string
+    type: object
+  otellab_internal_usecase.WeatherByCepOutputDTO:
+    properties:
+      cep:
+        type: string
+      city:
+        type: string
+      coordinates:
+        type: string
+      country:
+        type: string
+      region:
+        type: string
+      temp_C:
+        type: number
+      temp_F:
+        type: number
+      temp_K:
+        type: number
+    type: object
+info:
+  contact: {}
+  description: API for retrieving weather information by location
+  title: Weather API
+  version: "1.0"
+paths:
+  /temperature:
+    post:
+      consumes:
+      - application/json
+      description: Recebe um CEP no corpo da requisição e retorna informações de clima.
+      parameters:
+      - description: CEP da Localização
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_infra_web.Location'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/otellab_internal_usecase.WeatherByCepOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_infra_web.Error400'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_infra_web.Error404'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/internal_infra_web.Error422'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_infra_web.Error500'
+      summary: Get Weather by CEP
+      tags:
+      - Weather
+swagger: "2.0"

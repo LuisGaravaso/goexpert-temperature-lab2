@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"  # Porta do Zipkin
+    networks:
+      - telemetry
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    ports:
+      - "4317:4317"  # Porta OTLP (recebe dados de telemetria)
+      - "9412:9411"  # Porta Zipkin (exporta dados para Zipkin)
+    volumes:
+      - ./otel-collector-config.yaml:/otel-local-config.yaml
+    command: [
+      "--config", "/otel-local-config.yaml"
+    ]
+    depends_on:
+      - zipkin # Garante que o Zipkin será iniciado antes
+    networks:
+      - telemetry
+
+  service-a:
+    build:
+      context: service_a  # Caminho para o diretório com a aplicação Go
+    container_name: service-a
+    ports:
+      - "8080:8080"  # Expondo a porta 8080 para a aplicação Go
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317 # Endereço do Collector OTLP
+      - SERVICE_NAME=service-a-post-weather-by-cep # Nome do serviço
+      - WEATHER_API_URL=http://service-b:8081/temperature # Endereço do serviço B
+      - WEBPORT=8080 # Porta da aplicação
+    depends_on:
+      - otel-collector # Garante que o Collector será iniciado antes
+      - service-b # Garante que o serviço B será iniciado antes
+    networks:
+      - telemetry
+
+  service-b:
+    build:
+      context: service_b  # Caminho para o diretório com a aplicação Go
+    container_name: service-b
+    ports:
+      - "8081:8081"  # Expondo a porta 8081 para a aplicação Go
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317 # Endereço do Collector OTLP
+      - SERVICE_NAME=service-b-get-weather-by-location # Nome do serviço
+      - WEATHER_API_KEY=${WEATHER_API_KEY} # Chave da API de clima
+      - WEBPORT=8081 # Porta da aplicação
+    depends_on:
+      - otel-collector # Garante que o Collector será iniciado antes
+    networks:
+      - telemetry
+
+networks:
+  telemetry:
+    driver: bridge
